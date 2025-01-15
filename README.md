@@ -1,0 +1,1 @@
+![Schematics](./documentation/Schematics.png)
