@@ -21,6 +21,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(6, OUTPUT);
   pwm.attach(6, 1000, 2000);
+  pwm.write(0);
 
   Serial.print("Current firmware is: ");
   Serial.println(WiFi.firmwareVersion());
@@ -53,17 +54,19 @@ void loop()
       {                         // if there's bytes to read from the client,
         char c = client.read(); // read a byte, then
         request += c;
-      }else{
+      }
+      else
+      {
         break;
       }
     }
 
-    int bodyStart=request.indexOf('{');
-    int bodyEnd=request.lastIndexOf('}');
-    String body = request.substring(bodyStart, bodyEnd+1);
+    int bodyStart = request.indexOf('{');
+    int bodyEnd = request.lastIndexOf('}');
+    String body = request.substring(bodyStart, bodyEnd + 1);
     JsonDocument doc;
     deserializeJson(doc, body);
-    int power=doc["power"];
+    int power = doc["power"];
     Serial.print("power: ");
     Serial.println();
     Serial.println(body);
@@ -83,28 +86,10 @@ void loop()
     client.stop();
   }
 
-  // analogWrite(6, 20);
-  /*
-    if(!pwm.attached()){
-    Serial.println("pwm not attached");
-    return;
-  }
-  Serial.print("Power is: ");
-  Serial.println(power);
-  pwm.write(power);
-  delay(500);
-  if (power >= 20){
-    increase = false;
-  } else if(power == 0){
-    increase = true;
-  }
-
-  if (increase)
-  {
-    power++;
-  } else {
-    power--;
-  }
-  */
-  // put your main code here, to run repeatedly:
+  int voltageSensorValue = analogRead(A0);
+  float voltage = voltageSensorValue * (5/1023.0) *2;
+  Serial.print("voltage of battery: ");
+  Serial.print(voltage);
+  Serial.println("V");
+  delay(100);
 }
