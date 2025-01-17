@@ -1,0 +1,4 @@
+struct Request
+{
+    int power;
+};
