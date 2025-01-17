@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Servo.h>
 #include <networking/networkingController.h>
+#include <battery/battery.h>
 
 Servo pwm;
 NetworkingController networkingController;
@@ -29,10 +30,6 @@ void loop()
     pwm.write(request.power);
   });
 
-  int voltageSensorValue = analogRead(A0);
-  float voltage = voltageSensorValue * (5/1023.0) *2;
-  Serial.print("voltage of battery: ");
-  Serial.print(voltage);
-  Serial.println("V");
+  getBatteryLevel(A0);
   delay(100);
 }
