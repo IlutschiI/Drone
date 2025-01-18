@@ -26,9 +26,9 @@ void NetworkingController::start()
     server.begin();
 }
 
-void NetworkingController::handlePendingRequests(void (*callback)(Request))
+void NetworkingController::handlePendingRequests(Response (*callback)(Request))
 {
-    Serial.println("checking new requests...");
+    //Serial.println("checking new requests...");
     WiFiClient client = server.available();
 
     if (client)
@@ -52,9 +52,9 @@ void NetworkingController::handlePendingRequests(void (*callback)(Request))
         int bodyStart = request.indexOf('{');
         int bodyEnd = request.lastIndexOf('}');
         String body = request.substring(bodyStart, bodyEnd + 1);
-        JsonDocument doc;
-        deserializeJson(doc, body);
-        int power = doc["power"];
+        JsonDocument requestJson;
+        deserializeJson(requestJson, body);
+        int power = requestJson["power"];
         Serial.print("power: ");
         Serial.println();
         Serial.println(body);
@@ -62,17 +62,20 @@ void NetworkingController::handlePendingRequests(void (*callback)(Request))
         Request requestStruct;
         requestStruct.power = power;
 
-        callback(requestStruct);
+        Response response = callback(requestStruct);
+        JsonDocument responseJson;
+        responseJson["batterySoC"]=response.batterySoC;
+        responseJson["batteryVoltage"]=response.batteryVoltage;
 
         // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
         // and a content-type so the client knows what's coming, then a blank line:
         client.println("HTTP/1.1 200 OK");
-        client.println("Content-type:text/html");
+        client.println("Content-type: application/json");
+        client.print("Content-Length: ");
+        client.println(measureJsonPretty(responseJson));
         client.println();
-        // the content of the HTTP response follows the header:
-        client.print("Hello World!");
-        // The HTTP response ends with another blank line:
-        client.println();
+        
+        serializeJsonPretty(responseJson, client);
 
         client.stop();
     }

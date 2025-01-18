@@ -1,4 +1,5 @@
 #include "request.h"
+#include "response.h"
 
 class NetworkingController
 {
@@ -8,6 +9,6 @@ public:
     NetworkingController();
 
     void start();
-    void handlePendingRequests(void (*callback)(Request));
+    void handlePendingRequests(Response (*callback)(Request));
 };
 
