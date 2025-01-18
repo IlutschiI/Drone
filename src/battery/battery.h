@@ -1,2 +1,4 @@
 #include <Arduino.h>
-float getBatteryLevel(uint8_t);
+int getBatteryLevel(uint8_t);
+
+float getBatteryVoltage(uint8_t);

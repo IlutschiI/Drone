@@ -26,10 +26,16 @@ bool increase = true;
 void loop()
 {
 
-  networkingController.handlePendingRequests([](Request request) -> void {
-    pwm.write(request.power);
-  });
+  networkingController.handlePendingRequests([](Request request) -> void
+                                             { pwm.write(request.power); });
 
-  getBatteryLevel(A0);
-  delay(100);
+  int batteryLevel = getBatteryLevel(A0);
+  float batterVoltage = getBatteryVoltage(A0);
+  Serial.print("battery level: ");
+  Serial.print(batteryLevel);
+  Serial.println("%");
+  Serial.print("battery Voltage: ");
+  Serial.print(batterVoltage);
+  Serial.println("V");
+  delay(1000);
 }
