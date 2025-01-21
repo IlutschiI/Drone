@@ -110,6 +110,8 @@ int getBatteryLevel(uint8_t pin)
 float getBatteryVoltage(uint8_t pin)
 {
     int voltageSensorValue = analogRead(A0);
+    Serial.print("voltage: ");
+    Serial.println(voltageSensorValue);
     float voltage = voltageSensorValue * (5 / 1023.0) * 2;
     return voltage;
 }

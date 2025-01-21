@@ -4,7 +4,17 @@
 #include <battery/battery.h>
 
 Servo pwm;
+Servo pwm2;
 NetworkingController networkingController;
+
+void _calibrateESC(){
+  pwm.write(180);
+  pwm2.write(180);
+  Serial.println("connect power now...");
+  delay(10000);
+  pwm.write(180);
+  pwm2.write(180);
+}
 
 void setup()
 {
@@ -14,29 +24,24 @@ void setup()
   {
     ;
   }
-  networkingController.start();
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(6, OUTPUT);
+  pinMode(5, OUTPUT);
   pwm.attach(6, 1000, 2000);
-  pwm.write(0);
+  pwm2.attach(5, 1000, 2000);
+  //_calibrateESC();
+  networkingController.start();
 }
 
 bool increase = true;
+int power = 0;
 
 void loop()
 {
-
-  networkingController.handlePendingRequests([](Request request) -> Response
-                                             { pwm.write(request.power);
-                                                return Response{.batterySoC = getBatteryLevel(A0), .batteryVoltage= getBatteryVoltage(A0)}; });
-
-  int batteryLevel = getBatteryLevel(A0);
-  float batterVoltage = getBatteryVoltage(A0);
-  //Serial.print("battery level: ");
-  //Serial.print(batteryLevel);
-  //Serial.println("%");
-  //Serial.print("battery Voltage: ");
-  //Serial.print(batterVoltage);
-  //Serial.println("V");
-  //delay(1000);
+  networkingController.handlePendingRequests([](Request request) -> Response { // pwm.write(request.power);
+    power = request.power;
+    return Response{.batterySoC = getBatteryLevel(A0), .batteryVoltage = getBatteryVoltage(A1)};
+  });
+  pwm.write(power);
+  pwm2.write(power);
 }
