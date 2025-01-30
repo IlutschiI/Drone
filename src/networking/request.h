@@ -1,4 +1,5 @@
 struct Request
 {
-    int power;
+    float power;
+    long timestamp;
 };

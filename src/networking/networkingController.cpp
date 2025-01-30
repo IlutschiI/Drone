@@ -28,7 +28,7 @@ void NetworkingController::start()
 
 void NetworkingController::handlePendingRequests(Response (*callback)(Request))
 {
-    //Serial.println("checking new requests...");
+    // Serial.println("checking new requests...");
     WiFiClient client = server.available();
 
     if (client)
@@ -54,18 +54,24 @@ void NetworkingController::handlePendingRequests(Response (*callback)(Request))
         String body = request.substring(bodyStart, bodyEnd + 1);
         JsonDocument requestJson;
         deserializeJson(requestJson, body);
-        int power = requestJson["power"];
-        Serial.print("power: ");
-        Serial.println();
-        Serial.println(body);
+        long timestamp = requestJson["timestamp"];
+        float power = requestJson["power"];
+        //Serial.print("power: ");
+        //Serial.println();
+        //Serial.println(body);
 
         Request requestStruct;
         requestStruct.power = power;
+        requestStruct.timestamp = timestamp;
 
-        Response response = callback(requestStruct);
         JsonDocument responseJson;
-        responseJson["batterySoC"]=response.batterySoC;
-        responseJson["batteryVoltage"]=response.batteryVoltage;
+        if (timestamp > lastTimestamp)
+        {
+            lastTimestamp = timestamp;
+            Response response = callback(requestStruct);
+            responseJson["batterySoC"] = response.batterySoC;
+            responseJson["batteryVoltage"] = response.batteryVoltage;
+        }
 
         // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
         // and a content-type so the client knows what's coming, then a blank line:
@@ -74,7 +80,7 @@ void NetworkingController::handlePendingRequests(Response (*callback)(Request))
         client.print("Content-Length: ");
         client.println(measureJsonPretty(responseJson));
         client.println();
-        
+
         serializeJsonPretty(responseJson, client);
 
         client.stop();

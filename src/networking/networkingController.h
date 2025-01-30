@@ -4,6 +4,7 @@
 class NetworkingController
 {
 private:
+    long lastTimestamp=0;
     /* data */
 public:
     NetworkingController();
